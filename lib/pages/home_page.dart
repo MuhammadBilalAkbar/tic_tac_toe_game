@@ -322,11 +322,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildIconButton(
-      {required VoidCallback onTap,
-      required String image,
-      required double height,
-      required double width}) {
+  Widget buildIconButton({
+    required VoidCallback onTap,
+    required String image,
+    required double height,
+    required double width,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
