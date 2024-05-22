@@ -9,7 +9,7 @@ class FrostedGlassBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
+      borderRadius: BorderRadius.circular(45),
       child: Container(
         color: Colors.transparent,
         child: Stack(
@@ -25,8 +25,8 @@ class FrostedGlassBox extends StatelessWidget {
             //gradient effect
             Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: Colors.black.withOpacity(0.13)),
+                borderRadius: BorderRadius.circular(50),
+                border: Border.all(color: Colors.black.withOpacity(0.1)),
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
