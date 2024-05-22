@@ -574,6 +574,7 @@ class _HomePageState extends State<HomePage> {
         cancelTimer();
         showWinDialog(
             winner: winnerO ? 'O!' : 'X!', width: width, height: height);
+        return;
       }
 
       if (filledBoxes == 9) {
