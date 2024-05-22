@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const greenColor = Color(0xff01a510);
-  List listXO = List.generate(9, (index) => 'assets/images/box.png');
+  List<String> listXO = List.generate(9, (index) => 'assets/images/box.png');
 
   final playerOImage = 'assets/images/circle.png';
   final playerXImage = 'assets/images/close.png';
@@ -36,6 +36,102 @@ class _HomePageState extends State<HomePage> {
   int filledBoxes = 0;
 
   bool playAgain = false;
+
+  static const maxSeconds = 15;
+  int seconds = maxSeconds;
+  Timer? timer;
+
+  void startTimer() {
+    timer?.cancel();
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      setState(() {
+        if (seconds > 0) {
+          seconds--;
+        } else {
+          isOTurn = !isOTurn;
+          seconds = maxSeconds;
+          // if (seconds > 0) {
+          //   seconds--;
+          // }
+        }
+      });
+    });
+  }
+
+  Widget buildTimer(double width, double height){
+    // final isRunning = timer == null ? false : timer!.isActive;
+    return SizedBox(
+      width: 100,
+      height: 100,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CircularProgressIndicator(
+            value: 1 - seconds / maxSeconds,
+            valueColor: AlwaysStoppedAnimation(Colors.white),
+            strokeWidth: 8,
+            backgroundColor: greenColor,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onTap(int index, double width, double height) {
+    if (listXO[index] != emptyImage || winnerO || winnerX || filledBoxes == 9) {
+      return;
+    }
+    setState(() {
+      // if (listXO[index] != emptyImage) {
+      //   return;
+      // }
+      if (listXO[index] == emptyImage) {
+        listXO[index] = isOTurn ? playerOImage : playerXImage;
+        playSound(isOTurn ? oPlayerSound : xPlayerSound);
+        filledBoxes += 1;
+        // isOTurn = !isOTurn;
+        seconds = maxSeconds; // Reset the timer for the next player
+        startTimer();
+      }
+
+      // if (isOTurn && listXO[index] == emptyImage) {
+      //   listXO[index] = playerOImage;
+      //   playSound(oPlayerSound);
+      //   filledBoxes += 1;
+      //   startTimer();
+      // } else if (!isOTurn && listXO[index] == emptyImage) {
+      //   listXO[index] = playerXImage;
+      //   playSound(xPlayerSound);
+      //   filledBoxes += 1;
+      //   startTimer();
+      // }
+      isOTurn = !isOTurn;
+      seconds = maxSeconds;
+      checkWinner();
+
+      // if (winnerO) {
+      //   playSound(winnerSound);
+      //   showWinDialog(winner: 'O!', width: width, height: height);
+      // }
+      //
+      // if (winnerX) {
+      //   playSound(winnerSound);
+      //   showWinDialog(winner: 'X!', width: width, height: height);
+      // }
+
+      if (winnerO || winnerX) {
+        playSound(winnerSound);
+        timer?.cancel();
+        showWinDialog(winner: winnerO ? 'O!' : 'X!', width: width, height: height);
+      }
+
+      if (filledBoxes == 9 && winnerO == false && winnerX == false) {
+        playSound(equalSound);
+        timer?.cancel();
+        showWinDialog(winner: 'Equal!', width: width, height: height);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +156,7 @@ class _HomePageState extends State<HomePage> {
               buildRow(width, height),
               getScoreBoard(width, height),
               buildGridView(width, height),
+              buildTimer(width, height),
             ],
           ),
         ),
@@ -376,172 +473,202 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void onTap(int index, double width, double height) {
-    setState(() {
-      if (listXO[index] != emptyImage) {
-        return;
-      } else if (isOTurn && listXO[index] == emptyImage) {
-        listXO[index] = playerOImage;
-        playSound(oPlayerSound);
-        filledBoxes = filledBoxes + 1;
-      } else if (!isOTurn && listXO[index] == emptyImage) {
-        listXO[index] = playerXImage;
-        playSound(xPlayerSound);
-        filledBoxes = filledBoxes + 1;
-      }
-      isOTurn = !isOTurn;
-      checkWinner();
-
-      if (winnerO == true) {
-        playSound(winnerSound);
-        showWinDialog(winner: 'O!', width: width, height: height);
-      }
-
-      if (winnerX == true) {
-        playSound(winnerSound);
-        showWinDialog(winner: 'X!', width: width, height: height);
-      }
-
-      if (filledBoxes == 9 && winnerO == false && winnerX == false) {
-        playSound(equalSound);
-        showWinDialog(winner: 'Equal!', width: width, height: height);
-      }
-    });
-  }
-
   void checkWinner() {
-    // check 1st row
-    if (listXO[0] == listXO[1] &&
-        listXO[0] == listXO[2] &&
-        listXO[0] != emptyImage) {
-      if (listXO[0] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check 2nd row
-    else if (listXO[3] == listXO[4] &&
-        listXO[3] == listXO[5] &&
-        listXO[3] != emptyImage) {
-      if (listXO[3] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check 3rd row
-    else if (listXO[6] == listXO[7] &&
-        listXO[6] == listXO[8] &&
-        listXO[6] != emptyImage) {
-      if (listXO[6] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check 1st column
-    else if (listXO[0] == listXO[3] &&
-        listXO[0] == listXO[6] &&
-        listXO[0] != emptyImage) {
-      if (listXO[0] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check 2nd column
-    else if (listXO[1] == listXO[4] &&
-        listXO[1] == listXO[7] &&
-        listXO[1] != emptyImage) {
-      if (listXO[1] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check 3rd column
-    else if (listXO[2] == listXO[5] &&
-        listXO[2] == listXO[8] &&
-        listXO[2] != emptyImage) {
-      if (listXO[2] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check diagonal
-    else if (listXO[0] == listXO[4] &&
-        listXO[0] == listXO[8] &&
-        listXO[0] != emptyImage) {
-      if (listXO[0] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    }
-
-    // check inverse diagonal
-    else if (listXO[2] == listXO[4] &&
-        listXO[2] == listXO[6] &&
-        listXO[2] != emptyImage) {
-      if (listXO[2] == playerOImage) {
-        playerOScore++;
-        winnerO = true;
-        clearBoard();
-      } else {
-        playerXScore++;
-        winnerX = true;
-        clearBoard();
-        return;
-      }
-    } else if (filledBoxes == 9) {
-      equal = equal + 1;
+    // Helper method to update the score and clear the board
+    void updateScoreAndClearBoard(int index) {
+      (listXO[index] == playerOImage) ? playerOScore++ : playerXScore++;
+      (listXO[index] == playerOImage) ? winnerO = true : winnerX = true;
       clearBoard();
+    }
+
+    // Check 1st row
+    if (listXO[0] == listXO[1] && listXO[0] == listXO[2] && listXO[0] != emptyImage) {
+      updateScoreAndClearBoard(0);
       return;
     }
+
+    // Check 2nd row
+    if (listXO[3] == listXO[4] && listXO[3] == listXO[5] && listXO[3] != emptyImage) {
+      updateScoreAndClearBoard(3);
+      return;
+    }
+
+    // Check 3rd row
+    if (listXO[6] == listXO[7] && listXO[6] == listXO[8] && listXO[6] != emptyImage) {
+      updateScoreAndClearBoard(6);
+      return;
+    }
+
+    // Check 1st column
+    if (listXO[0] == listXO[3] && listXO[0] == listXO[6] && listXO[0] != emptyImage) {
+      updateScoreAndClearBoard(0);
+      return;
+    }
+
+    // Check 2nd column
+    if (listXO[1] == listXO[4] && listXO[1] == listXO[7] && listXO[1] != emptyImage) {
+      updateScoreAndClearBoard(1);
+      return;
+    }
+
+    // Check 3rd column
+    if (listXO[2] == listXO[5] && listXO[2] == listXO[8] && listXO[2] != emptyImage) {
+      updateScoreAndClearBoard(2);
+      return;
+    }
+
+    // Check diagonal
+    if (listXO[0] == listXO[4] && listXO[0] == listXO[8] && listXO[0] != emptyImage) {
+      updateScoreAndClearBoard(0);
+      return;
+    }
+
+    // Check inverse diagonal
+    if (listXO[2] == listXO[4] && listXO[2] == listXO[6] && listXO[2] != emptyImage) {
+      updateScoreAndClearBoard(2);
+      return;
+    }
+
+    // If all boxes are filled and no winner, it's a draw
+    if (filledBoxes == 9) {
+      equal++;
+      clearBoard();
+    }
   }
+
+  // void checkWinner() {
+  //   // check 1st row
+  //   if (listXO[0] == listXO[1] &&
+  //       listXO[0] == listXO[2] &&
+  //       listXO[0] != emptyImage) {
+  //     if (listXO[0] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check 2nd row
+  //   else if (listXO[3] == listXO[4] &&
+  //       listXO[3] == listXO[5] &&
+  //       listXO[3] != emptyImage) {
+  //     if (listXO[3] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check 3rd row
+  //   else if (listXO[6] == listXO[7] &&
+  //       listXO[6] == listXO[8] &&
+  //       listXO[6] != emptyImage) {
+  //     if (listXO[6] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check 1st column
+  //   else if (listXO[0] == listXO[3] &&
+  //       listXO[0] == listXO[6] &&
+  //       listXO[0] != emptyImage) {
+  //     if (listXO[0] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check 2nd column
+  //   else if (listXO[1] == listXO[4] &&
+  //       listXO[1] == listXO[7] &&
+  //       listXO[1] != emptyImage) {
+  //     if (listXO[1] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check 3rd column
+  //   else if (listXO[2] == listXO[5] &&
+  //       listXO[2] == listXO[8] &&
+  //       listXO[2] != emptyImage) {
+  //     if (listXO[2] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check diagonal
+  //   else if (listXO[0] == listXO[4] &&
+  //       listXO[0] == listXO[8] &&
+  //       listXO[0] != emptyImage) {
+  //     if (listXO[0] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   }
+  //
+  //   // check inverse diagonal
+  //   else if (listXO[2] == listXO[4] &&
+  //       listXO[2] == listXO[6] &&
+  //       listXO[2] != emptyImage) {
+  //     if (listXO[2] == playerOImage) {
+  //       playerOScore++;
+  //       winnerO = true;
+  //       clearBoard();
+  //     } else {
+  //       playerXScore++;
+  //       winnerX = true;
+  //       clearBoard();
+  //       return;
+  //     }
+  //   } else if (filledBoxes == 9) {
+  //     equal = equal + 1;
+  //     clearBoard();
+  //     return;
+  //   }
+  // }
 
   void clearBoard() {
     Future.delayed(
