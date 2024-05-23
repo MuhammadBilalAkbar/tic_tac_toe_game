@@ -80,6 +80,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             buildIconButton(
               onTap: () => pauseGame(width, height),
+              // onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
               image: isPaused ? resumeIcon : pauseIcon,
               width: width,
               // height: height,
@@ -653,10 +654,10 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Positioned(
                         bottom: height * 0.08,
-                        left: width * 0.028,
+                        left: width * 0.01,
                         child: Image.asset(
                           winImage,
-                          scale: width / 560,
+                          scale: width / 400,
                         ),
                       ),
                     ],
