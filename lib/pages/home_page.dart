@@ -73,6 +73,8 @@ class _HomePageState extends State<HomePage> {
       right: 0,
       bottom: height * 0.87,
       child: Container(
+        // height: double.infinity,
+        // width: double.infinity,
         margin: EdgeInsets.all(width * 0.05),
         child: Row(
           children: [
@@ -80,21 +82,21 @@ class _HomePageState extends State<HomePage> {
               onTap: () => pauseGame(width, height),
               image: isPaused ? resumeIcon : pauseIcon,
               width: width,
-              height: height,
+              // height: height,
             ),
             const Spacer(),
             buildIconButton(
               onTap: toggleSound,
               image: musicIcon,
               width: width,
-              height: height,
+              // height: height,
             ),
             SizedBox(width: width * 0.04),
             buildIconButton(
               onTap: () => resetGame(width, height),
               image: resetIcon,
               width: width,
-              height: height,
+              // height: height,
             ),
           ],
         ),
@@ -243,7 +245,7 @@ class _HomePageState extends State<HomePage> {
             itemCount: 9,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 3,
-              mainAxisExtent: width / width * 132,
+              mainAxisExtent: width * 0.3,
             ),
             itemBuilder: (context, index) {
               BorderRadius borderRadius;
@@ -288,15 +290,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildTimer(double width, double height) {
-    return Positioned.fill(
+    return Positioned(
       top: height * 0.8,
+      left: 0,
+      right: 0,
       child: Align(
         alignment: Alignment.center,
         child: SizedBox(
-          width: width / width * 100,
-          height: height / height * 100,
+          width: width * 0.2,
+          height: width * 0.2,
           child: Stack(
             fit: StackFit.expand,
+            alignment: Alignment.center,
             children: [
               CircularProgressIndicator(
                 value: 1 - seconds / maxSeconds,
@@ -325,7 +330,6 @@ class _HomePageState extends State<HomePage> {
   Widget buildIconButton({
     required VoidCallback onTap,
     required String image,
-    required double height,
     required double width,
   }) {
     return GestureDetector(
@@ -340,7 +344,7 @@ class _HomePageState extends State<HomePage> {
           ]),
           borderRadius: BorderRadius.circular(7),
         ),
-        child: Image.asset(image, scale: width / width * 2),
+        child: Image.asset(image, scale: width / 200),
       ),
     );
   }
@@ -652,7 +656,7 @@ class _HomePageState extends State<HomePage> {
                         left: width * 0.028,
                         child: Image.asset(
                           winImage,
-                          scale: width / width * 0.8,
+                          scale: width / 560,
                         ),
                       ),
                     ],
