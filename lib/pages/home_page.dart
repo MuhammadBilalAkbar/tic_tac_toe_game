@@ -79,8 +79,8 @@ class _HomePageState extends State<HomePage> {
         child: Row(
           children: [
             buildIconButton(
-              onTap: () => pauseGame(width, height),
-              // onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
+              // onTap: () => pauseGame(width, height),
+              onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
               image: isPaused ? resumeIcon : pauseIcon,
               width: width,
               // height: height,
@@ -608,6 +608,7 @@ class _HomePageState extends State<HomePage> {
             });
 
             return AlertDialog(
+              insetPadding: EdgeInsets.zero,
               contentPadding: EdgeInsets.only(top: height * 0.05),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -616,6 +617,7 @@ class _HomePageState extends State<HomePage> {
                     clipBehavior: Clip.none,
                     children: [
                       Container(
+                        // height: height * 0.1,
                         margin: EdgeInsets.all(width * 0.06),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -653,8 +655,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       Positioned(
-                        bottom: height * 0.08,
-                        left: width * 0.01,
+                        // bottom: height * 0.08,
+                        // left: width * 0.01,
+                        bottom: height * 0.12,
+                        left: width * 0.08,
                         child: Image.asset(
                           winImage,
                           scale: width / 400,
