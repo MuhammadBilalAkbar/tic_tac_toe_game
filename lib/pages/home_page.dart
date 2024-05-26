@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
                 fit: BoxFit.fitWidth,
               ),
               Container(
-                color: Colors.black54,
+                color: Colors.black.withOpacity(0.65),
                 height: double.infinity,
                 width: double.infinity,
               ),
@@ -71,33 +72,30 @@ class _HomePageState extends State<HomePage> {
       top: 0,
       left: 0,
       right: 0,
-      bottom: height * 0.87,
+      bottom: height * 0.83,
       child: Container(
-        // height: double.infinity,
-        // width: double.infinity,
+        height: double.infinity,
+        width: double.infinity,
         margin: EdgeInsets.all(width * 0.05),
         child: Row(
           children: [
             buildIconButton(
-              // onTap: () => pauseGame(width, height),
-              onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
+              onTap: () => pauseGame(width, height),
+              // onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
               image: isPaused ? resumeIcon : pauseIcon,
               width: width,
-              // height: height,
             ),
             const Spacer(),
             buildIconButton(
               onTap: toggleSound,
-              image: musicIcon,
+              image: isMuted ? musicIcon : noMusicIcon,
               width: width,
-              // height: height,
             ),
             SizedBox(width: width * 0.04),
             buildIconButton(
               onTap: () => resetGame(width, height),
               image: resetIcon,
               width: width,
-              // height: height,
             ),
           ],
         ),
@@ -107,7 +105,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget getScoreBoard(double width, double height) {
     return Positioned(
-      top: height * 0.1,
+      top: height * 0.11,
       left: 0,
       right: 0,
       child: Center(
@@ -117,13 +115,14 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    height: height * 0.06,
+                    height: height * 0.065,
                     width: width * 0.35,
                     padding: EdgeInsets.symmetric(
-                      vertical: width * 0.01,
-                      horizontal: width * 0.02,
+                      vertical: width * 0.011,
+                      horizontal: width * 0.03,
                     ),
                     decoration: BoxDecoration(
                       color: isOTurn ? greenColor : Colors.grey,
@@ -162,8 +161,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               Container(
-                height: height * 0.06,
-                width: width * 0.13,
+                height: height * 0.065,
+                width: width * 0.15,
                 margin: EdgeInsets.only(bottom: height * 0.038),
                 decoration: BoxDecoration(
                   color: Colors.grey,
@@ -180,11 +179,11 @@ class _HomePageState extends State<HomePage> {
               Column(
                 children: [
                   Container(
-                    height: height * 0.06,
+                    height: height * 0.065,
                     width: width * 0.35,
                     padding: EdgeInsets.symmetric(
-                      vertical: width * 0.01,
-                      horizontal: width * 0.02,
+                      vertical: width * 0.011,
+                      horizontal: width * 0.03,
                     ),
                     decoration: BoxDecoration(
                       color: !isOTurn ? greenColor : Colors.grey,
@@ -233,57 +232,60 @@ class _HomePageState extends State<HomePage> {
     return Align(
       alignment: Alignment.center,
       child: Container(
-        height: height * 0.42,
+        height: height * 0.425,
         width: double.infinity,
         margin: EdgeInsets.all(width * 0.05),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.7),
-          border: Border.all(color: Colors.white, width: 3),
+          // border: Border.all(color: Colors.white, width: 3),
           borderRadius: BorderRadius.circular(50),
         ),
         child: FrostedGlassBox(
-          child: GridView.builder(
-            itemCount: 9,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisExtent: width * 0.3,
-            ),
-            itemBuilder: (context, index) {
-              BorderRadius borderRadius;
-              if (index == 0) {
-                borderRadius = const BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                );
-              } else if (index == 2) {
-                borderRadius = const BorderRadius.only(
-                  topRight: Radius.circular(50),
-                );
-              } else if (index == 6) {
-                borderRadius = const BorderRadius.only(
-                  bottomLeft: Radius.circular(50),
-                );
-              } else if (index == 8) {
-                borderRadius = const BorderRadius.only(
-                  bottomRight: Radius.circular(50),
-                );
-              } else {
-                borderRadius = BorderRadius.circular(0);
-              }
-              return GestureDetector(
-                onTap: isPaused ? () {} : () => onTap(index, width, height),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: borderRadius,
-                    border: Border.all(color: Colors.white),
-                  ),
-                  child: Center(
-                    child: Image(
-                      image: AssetImage(listXO[index]),
+          child: SizedBox(
+            height: height * 0.425,
+            child: GridView.builder(
+              itemCount: 9,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisExtent: width * 0.3,
+              ),
+              itemBuilder: (context, index) {
+                BorderRadius borderRadius;
+                if (index == 0) {
+                  borderRadius = const BorderRadius.only(
+                    topLeft: Radius.circular(50),
+                  );
+                } else if (index == 2) {
+                  borderRadius = const BorderRadius.only(
+                    topRight: Radius.circular(50),
+                  );
+                } else if (index == 6) {
+                  borderRadius = const BorderRadius.only(
+                    bottomLeft: Radius.circular(50),
+                  );
+                } else if (index == 8) {
+                  borderRadius = const BorderRadius.only(
+                    bottomRight: Radius.circular(50),
+                  );
+                } else {
+                  borderRadius = BorderRadius.circular(0);
+                }
+                return GestureDetector(
+                  onTap: isPaused ? () {} : () => onTap(index, width, height),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: borderRadius,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    child: Center(
+                      child: Image(
+                        image: AssetImage(listXO[index]),
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -311,7 +313,8 @@ class _HomePageState extends State<HomePage> {
                 strokeWidth: 8,
                 backgroundColor: !isOTurn ? greenColor : Colors.grey,
               ),
-              Center(
+              Align(
+                alignment: Alignment.center,
                 child: Text(
                   '$seconds',
                   style: const TextStyle(
@@ -338,6 +341,7 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         width: width * 0.1,
         height: width * 0.1,
+        padding: EdgeInsets.all(width * 0.02),
         decoration: BoxDecoration(
           gradient: const LinearGradient(colors: [
             greenColor,
@@ -345,7 +349,7 @@ class _HomePageState extends State<HomePage> {
           ]),
           borderRadius: BorderRadius.circular(7),
         ),
-        child: Image.asset(image, scale: width / 200),
+        child: Image.asset(image),
       ),
     );
   }
@@ -359,8 +363,9 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: width,
-        height: height,
+        width: width * 0.2,
+        height: height * 0.05,
+        padding: EdgeInsets.symmetric(horizontal: width * 0.01, vertical: height * 0.005),
         decoration: BoxDecoration(
           color: greenColor,
           borderRadius: BorderRadius.circular(7),
@@ -469,10 +474,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 const Spacer(),
                 buildTextButton(
-                  onTap: Navigator.of(context).pop,
-                  width: width * 0.11,
-                  height: width * 0.075,
+                  onTap: ()=> Navigator.pop(context),
                   text: 'No',
+                  width: width,
+                  height: height,
                 ),
                 SizedBox(width: width * 0.02),
                 buildTextButton(
@@ -487,13 +492,15 @@ class _HomePageState extends State<HomePage> {
                       playerOScore = 0;
                       playerXScore = 0;
                       equal = 0;
+                      resetTimer();
+                      pauseTimer();
                     });
                     playSound(resetGameSound);
                     Navigator.pop(context);
                   },
-                  width: width * 0.11,
-                  height: width * 0.075,
                   text: 'Yes',
+                  width: width,
+                  height: height,
                 ),
               ],
             ),
@@ -533,10 +540,10 @@ class _HomePageState extends State<HomePage> {
               children: [
                 const Spacer(),
                 buildTextButton(
-                  onTap: Navigator.of(context).pop,
-                  width: width * 0.11,
-                  height: width * 0.075,
+                  onTap: () => Navigator.pop(context),
                   text: 'No',
+                  width: width,
+                  height: height,
                 ),
                 SizedBox(width: width * 0.02),
                 buildTextButton(
@@ -547,9 +554,9 @@ class _HomePageState extends State<HomePage> {
                     });
                     Navigator.pop(context);
                   },
-                  width: width * 0.11,
-                  height: width * 0.075,
                   text: 'Yes',
+                  width: width,
+                  height: height,
                 ),
               ],
             ),
@@ -560,6 +567,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onTap(int index, double width, double height) {
+
+    // void makeComputerMove(double width, double height) {
+    //   List<int> emptyIndexes = [];
+    //   for (int i = 0; i < listXO.length; i++) {
+    //     if (listXO[i] == emptyImage) {
+    //       emptyIndexes.add(i);
+    //     }
+    //   }
+    //
+    //   if (emptyIndexes.isNotEmpty) {
+    //     int randomIndex = emptyIndexes[Random().nextInt(emptyIndexes.length)];
+    //     onTap(randomIndex, width, height);
+    //   }
+    // }
+
     if (listXO[index] != emptyImage || winnerO || winnerX || filledBoxes == 9) {
       return;
     }
@@ -586,7 +608,15 @@ class _HomePageState extends State<HomePage> {
         playSound(equalSound);
         cancelTimer();
         showWinDialog(winner: 'Equal!', width: width, height: height);
+        return;
       }
+
+      // If it's the computer's turn, make a random move
+      // if (!isOTurn) {
+      //   Future.delayed(Duration(milliseconds: 500), () {
+      //     makeComputerMove(width, height);
+      //   });
+      // }
     });
   }
 
@@ -608,63 +638,55 @@ class _HomePageState extends State<HomePage> {
             });
 
             return AlertDialog(
-              insetPadding: EdgeInsets.zero,
-              contentPadding: EdgeInsets.only(top: height * 0.05),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+              content: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
                 children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        // height: height * 0.1,
-                        margin: EdgeInsets.all(width * 0.06),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Winner: $winner', style: textStyle3),
-                            SizedBox(height: height * 0.01),
-                            Container(
-                              width: width * 0.33,
-                              height: width * 0.11,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(7),
-                              ),
-                              child: Center(
-                                child: playAgain
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          setState(() => playAgain = false);
-                                        },
-                                        child: const Text(
-                                          'Play Again',
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      )
-                                    : const CircularProgressIndicator(
+                  Positioned(
+                    bottom: height * 0.08,
+                    left: 0,
+                    right: 0,
+                    child: Image.asset(
+                      winImage,
+                      // scale: width / 400,
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: height * 0.06),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Winner: $winner', style: textStyle3),
+                        SizedBox(height: height * 0.01),
+                        Container(
+                          width: width * 0.33,
+                          height: width * 0.11,
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          child: Center(
+                            child: playAgain
+                                ? GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      setState(() => playAgain = false);
+                                    },
+                                    child: const Text(
+                                      'Play Again',
+                                      style: TextStyle(
+                                        fontSize: 24,
                                         color: Colors.white,
                                       ),
-                              ),
-                            ),
-                          ],
+                                    ),
+                                  )
+                                : const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        // bottom: height * 0.08,
-                        // left: width * 0.01,
-                        bottom: height * 0.12,
-                        left: width * 0.08,
-                        child: Image.asset(
-                          winImage,
-                          scale: width / 400,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

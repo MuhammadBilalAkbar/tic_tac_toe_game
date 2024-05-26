@@ -12,6 +12,7 @@ const pauseIcon = 'assets/icons/pause.png';
 const resumeIcon = 'assets/icons/resume.png';
 const musicIcon = 'assets/icons/music.png';
 const resetIcon = 'assets/icons/reset.png';
+const noMusicIcon = 'assets/icons/no_music.png';
 
 // Audios
 const equalSound = 'audios/equal.wav';
