@@ -23,3 +23,15 @@ const resetGameSound = 'audios/reset.mp3';
 
 // Colors
 const greenColor = Color(0xff01a510);
+
+// Text Styles
+const textStyle1 = TextStyle(
+  fontWeight: FontWeight.bold,
+  color: Colors.white,
+);
+const textStyle2 = TextStyle(
+  fontSize: 20,
+  fontWeight: FontWeight.bold,
+  color: Colors.white,
+);
+const textStyle3 = TextStyle(fontSize: 20, fontWeight: FontWeight.bold);

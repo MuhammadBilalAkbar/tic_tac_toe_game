@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -22,17 +21,15 @@ class _HomePageState extends State<HomePage> {
   bool isMuted = false;
   bool isOTurn = true;
   bool isPaused = false;
-
   int playerOScore = 0;
   int playerXScore = 0;
-  int equal = 0;
+  int equalScore = 0;
   int filledBoxes = 0;
+  bool playAgain = false;
 
   static const maxSeconds = 15;
   int seconds = maxSeconds;
   Timer? turnTimer;
-
-  bool playAgain = false;
 
   @override
   Widget build(BuildContext context) {
@@ -81,13 +78,12 @@ class _HomePageState extends State<HomePage> {
           children: [
             buildIconButton(
               onTap: () => pauseGame(width, height),
-              // onTap: () => showWinDialog(width: width, height: height, winner: 'm'),
               image: isPaused ? resumeIcon : pauseIcon,
               width: width,
             ),
             const Spacer(),
             buildIconButton(
-              onTap: toggleSound,
+              onTap: () => setState(() => isMuted = !isMuted),
               image: isMuted ? musicIcon : noMusicIcon,
               width: width,
             ),
@@ -99,6 +95,29 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildIconButton({
+    required VoidCallback onTap,
+    required String image,
+    required double width,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: width * 0.1,
+        height: width * 0.1,
+        padding: EdgeInsets.all(width * 0.02),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [
+            greenColor,
+            Colors.green,
+          ]),
+          borderRadius: BorderRadius.circular(7),
+        ),
+        child: Image.asset(image),
       ),
     );
   }
@@ -137,7 +156,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Player O', style: textStyle1),
+                            const Text('Player O', style: textStyle1),
                             Text('Win: $playerOScore', style: textStyle1),
                           ],
                         ),
@@ -156,7 +175,7 @@ class _HomePageState extends State<HomePage> {
                     maintainSize: true,
                     maintainAnimation: true,
                     maintainState: true,
-                    child: Text('Your Turn', style: textStyle2),
+                    child: const Text('Your Turn', style: textStyle2),
                   ),
                 ],
               ),
@@ -171,8 +190,8 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Equals', style: textStyle1),
-                    Text('$equal', style: textStyle1),
+                    const Text('Equals', style: textStyle1),
+                    Text('$equalScore', style: textStyle1),
                   ],
                 ),
               ),
@@ -198,7 +217,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Player X', style: textStyle1),
+                            const Text('Player X', style: textStyle1),
                             Text('Win: $playerXScore', style: textStyle1),
                           ],
                         ),
@@ -217,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                     maintainAnimation: true,
                     maintainSize: true,
                     maintainState: true,
-                    child: Text('Your Turn', style: textStyle2),
+                    child: const Text('Your Turn', style: textStyle2),
                   ),
                 ],
               ),
@@ -237,7 +256,6 @@ class _HomePageState extends State<HomePage> {
         margin: EdgeInsets.all(width * 0.05),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.7),
-          // border: Border.all(color: Colors.white, width: 3),
           borderRadius: BorderRadius.circular(50),
         ),
         child: FrostedGlassBox(
@@ -331,25 +349,45 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget buildIconButton({
-    required VoidCallback onTap,
-    required String image,
-    required double width,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: width * 0.1,
-        height: width * 0.1,
-        padding: EdgeInsets.all(width * 0.02),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(colors: [
-            greenColor,
-            Colors.green,
-          ]),
-          borderRadius: BorderRadius.circular(7),
+  void pauseGame(double width, double height) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        contentPadding: EdgeInsets.all(width * 0.06),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isPaused
+                  ? 'Do you want to resume the game?'
+                  : 'Do you want to pause the game?',
+              style: textStyle3,
+            ),
+            SizedBox(height: height * 0.01),
+            Row(
+              children: [
+                const Spacer(),
+                buildTextButton(
+                  onTap: () => Navigator.pop(context),
+                  text: 'No',
+                  width: width,
+                  height: height,
+                ),
+                SizedBox(width: width * 0.02),
+                buildTextButton(
+                  onTap: () {
+                    isPaused ? startTimer() : pauseTimer();
+                    setState(() => isPaused = !isPaused);
+                    Navigator.pop(context);
+                  },
+                  text: 'Yes',
+                  width: width,
+                  height: height,
+                ),
+              ],
+            ),
+          ],
         ),
-        child: Image.asset(image),
       ),
     );
   }
@@ -365,7 +403,8 @@ class _HomePageState extends State<HomePage> {
       child: Container(
         width: width * 0.2,
         height: height * 0.05,
-        padding: EdgeInsets.symmetric(horizontal: width * 0.01, vertical: height * 0.005),
+        padding: EdgeInsets.symmetric(
+            horizontal: width * 0.01, vertical: height * 0.005),
         decoration: BoxDecoration(
           color: greenColor,
           borderRadius: BorderRadius.circular(7),
@@ -383,7 +422,134 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void startTimer() {
+    cancelTimer();
+    turnTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() {
+        if (seconds > 0) {
+          seconds--;
+        } else {
+          isOTurn = !isOTurn;
+          resetTimer();
+        }
+      });
+    });
+  }
+
+  void resetTimer() => seconds = maxSeconds;
+
+  void pauseTimer() {
+    if (turnTimer != null && turnTimer!.isActive) {
+      cancelTimer();
+    }
+  }
+
+  void cancelTimer() => turnTimer?.cancel();
+
+  void resetGame(double width, double height) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        contentPadding: EdgeInsets.all(width * 0.06),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Do you want to reset the game?', style: textStyle3),
+            SizedBox(height: height * 0.01),
+            Row(
+              children: [
+                const Spacer(),
+                buildTextButton(
+                  onTap: () => Navigator.pop(context),
+                  text: 'No',
+                  width: width,
+                  height: height,
+                ),
+                SizedBox(width: width * 0.02),
+                buildTextButton(
+                  onTap: () {
+                    setState(() {
+                      for (int i = 0; i < listXO.length; i++) {
+                        listXO[i] = emptyImage;
+                      }
+                      filledBoxes = 0;
+                      playerOScore = 0;
+                      playerXScore = 0;
+                      equalScore = 0;
+                      isPaused = isPaused && false;
+                      winnerO = false;
+                      winnerX = false;
+                      resetTimer();
+                      pauseTimer();
+                    });
+                    playSound(resetGameSound);
+                    Navigator.pop(context);
+                  },
+                  text: 'Yes',
+                  width: width,
+                  height: height,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // void toggleSound() => setState(() => isMuted = !isMuted);
+
+  void playSound(String path) {
+    final player = AudioPlayer();
+    !isMuted ? player.play(AssetSource(path)) : null;
+  }
+
+  void onTap(int index, double width, double height) {
+    if (listXO[index] != emptyImage || winnerO || winnerX || filledBoxes == 9) {
+      return;
+    }
+    setState(() {
+      if (listXO[index] == emptyImage) {
+        listXO[index] = isOTurn ? playerOImage : playerXImage;
+        playSound(isOTurn ? oPlayerSound : xPlayerSound);
+        startTimer();
+        filledBoxes++;
+        isOTurn = !isOTurn;
+        checkWinner();
+        resetTimer();
+      }
+
+      if (winnerO || winnerX) {
+        playSound(winnerSound);
+        cancelTimer();
+        showWinDialog(
+            winner: winnerO ? 'O!' : 'X!', width: width, height: height);
+        return;
+      }
+
+      if (filledBoxes == 9) {
+        playSound(equalSound);
+        cancelTimer();
+        showWinDialog(winner: 'Equal!', width: width, height: height);
+        return;
+      }
+    });
+  }
+
   void checkWinner() {
+
+    void clearBoard() {
+      Future.delayed(
+        const Duration(seconds: 2),
+            () => setState(() {
+          listXO.fillRange(0, listXO.length, emptyImage);
+          filledBoxes = 0;
+          winnerO = false;
+          winnerX = false;
+        }),
+      );
+    }
+
     // Helper method to update the score and clear the board
     void updateScoreAndClearBoard(int index) {
       (listXO[index] == playerOImage) ? playerOScore++ : playerXScore++;
@@ -441,183 +607,9 @@ class _HomePageState extends State<HomePage> {
     }
     // If all boxes are filled and no winner, it's a draw
     else if (filledBoxes == 9) {
-      equal++;
+      equalScore++;
       clearBoard();
     }
-  }
-
-  void clearBoard() {
-    Future.delayed(
-      const Duration(seconds: 2),
-      () => setState(() {
-        for (int i = 0; i < listXO.length; i++) {
-          listXO[i] = emptyImage;
-          filledBoxes = 0;
-          winnerO = false;
-          winnerX = false;
-        }
-      }),
-    );
-  }
-
-  void resetGame(double width, double height) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        contentPadding: EdgeInsets.all(width * 0.06),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Do you want to reset the game?', style: textStyle3),
-            SizedBox(height: height * 0.01),
-            Row(
-              children: [
-                const Spacer(),
-                buildTextButton(
-                  onTap: ()=> Navigator.pop(context),
-                  text: 'No',
-                  width: width,
-                  height: height,
-                ),
-                SizedBox(width: width * 0.02),
-                buildTextButton(
-                  onTap: () {
-                    setState(() {
-                      for (int i = 0; i < listXO.length; i++) {
-                        listXO[i] = emptyImage;
-                      }
-                      filledBoxes = 0;
-                      winnerO = false;
-                      winnerX = false;
-                      playerOScore = 0;
-                      playerXScore = 0;
-                      equal = 0;
-                      resetTimer();
-                      pauseTimer();
-                    });
-                    playSound(resetGameSound);
-                    Navigator.pop(context);
-                  },
-                  text: 'Yes',
-                  width: width,
-                  height: height,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void toggleSound() => setState(() => isMuted = !isMuted);
-
-  void playSound(String path) {
-    final player = AudioPlayer();
-    if (isMuted) {
-      null;
-    } else {
-      player.play(AssetSource(path));
-    }
-  }
-
-  void pauseGame(double width, double height) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        contentPadding: EdgeInsets.all(width * 0.06),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              isPaused
-                  ? 'Do you want to resume the game?'
-                  : 'Do you want to pause the game?',
-              style: textStyle3,
-            ),
-            SizedBox(height: height * 0.01),
-            Row(
-              children: [
-                const Spacer(),
-                buildTextButton(
-                  onTap: () => Navigator.pop(context),
-                  text: 'No',
-                  width: width,
-                  height: height,
-                ),
-                SizedBox(width: width * 0.02),
-                buildTextButton(
-                  onTap: () {
-                    setState(() {
-                      isPaused ? startTimer() : pauseTimer();
-                      isPaused = !isPaused;
-                    });
-                    Navigator.pop(context);
-                  },
-                  text: 'Yes',
-                  width: width,
-                  height: height,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void onTap(int index, double width, double height) {
-
-    // void makeComputerMove(double width, double height) {
-    //   List<int> emptyIndexes = [];
-    //   for (int i = 0; i < listXO.length; i++) {
-    //     if (listXO[i] == emptyImage) {
-    //       emptyIndexes.add(i);
-    //     }
-    //   }
-    //
-    //   if (emptyIndexes.isNotEmpty) {
-    //     int randomIndex = emptyIndexes[Random().nextInt(emptyIndexes.length)];
-    //     onTap(randomIndex, width, height);
-    //   }
-    // }
-
-    if (listXO[index] != emptyImage || winnerO || winnerX || filledBoxes == 9) {
-      return;
-    }
-    setState(() {
-      if (listXO[index] == emptyImage) {
-        listXO[index] = isOTurn ? playerOImage : playerXImage;
-        playSound(isOTurn ? oPlayerSound : xPlayerSound);
-        startTimer();
-        filledBoxes++;
-        isOTurn = !isOTurn;
-        checkWinner();
-        resetTimer();
-      }
-
-      if (winnerO || winnerX) {
-        playSound(winnerSound);
-        cancelTimer();
-        showWinDialog(
-            winner: winnerO ? 'O!' : 'X!', width: width, height: height);
-        return;
-      }
-
-      if (filledBoxes == 9) {
-        playSound(equalSound);
-        cancelTimer();
-        showWinDialog(winner: 'Equal!', width: width, height: height);
-        return;
-      }
-
-      // If it's the computer's turn, make a random move
-      // if (!isOTurn) {
-      //   Future.delayed(Duration(milliseconds: 500), () {
-      //     makeComputerMove(width, height);
-      //   });
-      // }
-    });
   }
 
   void showWinDialog({
@@ -646,10 +638,7 @@ class _HomePageState extends State<HomePage> {
                     bottom: height * 0.08,
                     left: 0,
                     right: 0,
-                    child: Image.asset(
-                      winImage,
-                      // scale: width / 400,
-                    ),
+                    child: Image.asset(winImage),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: height * 0.06),
@@ -696,44 +685,4 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-  void startTimer() {
-    cancelTimer();
-    turnTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        if (seconds > 0) {
-          seconds--;
-        } else {
-          isOTurn = !isOTurn;
-          resetTimer();
-        }
-      });
-    });
-  }
-
-  void cancelTimer() => turnTimer?.cancel();
-
-  void resetTimer() => seconds = maxSeconds;
-
-  void pauseTimer() {
-    if (turnTimer != null && turnTimer!.isActive) {
-      turnTimer?.cancel();
-    }
-  }
-
-  final textStyle1 = const TextStyle(
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  );
-
-  final textStyle2 = const TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  );
-
-  final textStyle3 = const TextStyle(
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-  );
 }
