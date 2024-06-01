@@ -497,8 +497,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // void toggleSound() => setState(() => isMuted = !isMuted);
-
   void playSound(String path) {
     final player = AudioPlayer();
     !isMuted ? player.play(AssetSource(path)) : null;
